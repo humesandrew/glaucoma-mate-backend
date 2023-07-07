@@ -1,27 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const Dose = require("../models/doseModel");
+const { 
+  createDose,
+  getDoses,
+  getDose
+ } = require('../controllers/doseController');
 
 // Get all doses
-router.get("/", (req, res) => {
-  res.json({ mssg: "GET all doses." });
-});
+router.get("/", getDoses);
 
 // Get single dose
-router.get("/:id", (req, res) => {
-  res.json({ mssg: "GET a single dose." });
-});
+router.get("/:id", getDose);
 
 // Post a dose
-router.post("/", async (req, res) => {
-  const {name, dose, capColor} = req.body;
-  try {
-    const dose = await Dose.create({ name, dose, capColor });
-    res.status(200).json(dose);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+router.post("/", createDose)
 
 // Delete a dose
 router.delete("/:id", (req, res) => {
