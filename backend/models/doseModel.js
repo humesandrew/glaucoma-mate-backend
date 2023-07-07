@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const prescriptionSchema = new Schema(
+const doseSchema = new Schema(
   {
     name: {
       type: String,
@@ -20,4 +20,4 @@ const prescriptionSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Prescription', prescriptionSchema);
+module.exports = mongoose.model('Dose', doseSchema);
