@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const Prescription = require("../models/prescriptionModel");
 
 // Get all prescriptions
 router.get("/", (req, res) => {
@@ -12,8 +13,14 @@ router.get("/:id", (req, res) => {
 });
 
 // Post a prescription
-router.post("/", (req, res) => {
-  res.json({ mssg: "POST a single prescription." });
+router.post("/", async (req, res) => {
+  const {name, dose, capColor} = req.body;
+  try {
+    const prescription = await Prescription.create({ name, dose, capColor });
+    res.status(200).json(prescription);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // Delete a prescription
