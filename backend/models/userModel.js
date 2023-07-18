@@ -18,20 +18,19 @@ const userSchema = new Schema({
 
 // Static signup method
 userSchema.statics.signup = async function (email, password) {
+  // validation //
+  if (!email || !password) {
+    throw Error("All fields must be filled.");
+  }
 
-
-// validation //
-if (!email || !password) {
-  throw Error("All fields must be filled.");
-}
-
-if (!validator.isEmail(email)) {
-  throw Error("Email is not valid.")
-}
-if (!validator.isStrongPassword(password)) {
-  throw Error("Password not strong enough. Please include at least 1 capitol, 1 number, and 1 special character.")
-}
-
+  if (!validator.isEmail(email)) {
+    throw Error("Email is not valid.");
+  }
+  if (!validator.isStrongPassword(password)) {
+    throw Error(
+      "Password not strong enough. Please include at least 1 capitol, 1 number, and 1 special character."
+    );
+  }
 
   const exists = await this.findOne({ email });
 
@@ -39,7 +38,7 @@ if (!validator.isStrongPassword(password)) {
     throw new Error("Email already in use.");
   }
 
-  if (typeof password !== 'string') {
+  if (typeof password !== "string") {
     throw new Error("Password must be a string.");
   }
 
@@ -53,6 +52,25 @@ if (!validator.isStrongPassword(password)) {
     console.error("Error while hashing the password:", error);
     throw new Error("Error while hashing the password.");
   }
+};
+// login
+// login
+// login
+userSchema.statics.login = async function (email, password) {
+  if (!email || !password) {
+    throw new Error("User doesn't exist.");
+  }
+  const user = await this.findOne({ email }).exec(); // Add .exec() at the end
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    throw new Error("Incorrect password.");
+  }
+  return user;
 };
 
 module.exports = mongoose.model("User", userSchema);
