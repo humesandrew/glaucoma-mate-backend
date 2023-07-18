@@ -39,8 +39,6 @@ if (!validator.isStrongPassword(password)) {
     throw new Error("Email already in use.");
   }
 
-  console.log("Password:", password); // Add this line for debugging
-
   if (typeof password !== 'string') {
     throw new Error("Password must be a string.");
   }
