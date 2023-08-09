@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dosesRoutes = require("./routes/doses");
 const userRoutes = require("./routes/user");
-const cors = require("cors"); // Import the cors package
+const cors = require("cors");
 require('dotenv').config();
 
 const app = express();
@@ -29,8 +29,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 })
   .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log('Connected to db and listening on port ' + process.env.PORT);
+    app.listen(process.env.PORT || 80, () => {
+      console.log('Connected to db and listening on port ' + (process.env.PORT || 80));
     });
   })
   .catch((error) => {
