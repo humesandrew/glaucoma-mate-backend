@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dosesRoutes = require("./routes/doses");
 const userRoutes = require("./routes/user");
+const seedMedications = require('./seed.js');
 const cors = require("cors");
 require('dotenv').config();
 
@@ -28,7 +29,11 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => {
+  .then(async () => {
+    // Seed medications
+    await seedMedications();
+
+    // Start the Express server
     app.listen(process.env.PORT || 80, () => {
       console.log('Connected to db and listening on port ' + (process.env.PORT || 80));
     });
