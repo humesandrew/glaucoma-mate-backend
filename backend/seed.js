@@ -4,8 +4,11 @@ const Medication = require('./models/medicationModel');
 
 const seedMedications = async () => {
     const commonMedications = [
-      { name: 'Medication 1', dosage: 5, sig: 'Description 1', capColor: 'teal' },
-      { name: 'Medication 2', dosage: 10, sig: 'Description 2', capColor: 'blue' },
+      { name: 'Latanoprost', dosage: 1, sig: 'Instill 1 drop every night at bedtime.', capColor: 'teal' },
+      { name: 'CoSopt', dosage: 2, sig: 'Instill 1 drop 2 times every day.', capColor: 'blue' },
+      { name: 'Timolol', dosage: 2, sig: 'Instill 1 drop 2 times every day.', capColor: 'yellow' },
+      { name: 'Dorzolamide', dosage: 2, sig: 'Instill 1 drop 2 every day.', capColor: 'purple' },
+      
       // Add more medications as needed
     ];
   
