@@ -12,10 +12,6 @@ const doseSchema = new Schema(
       type: Number,
       required: true,
     },
-    capColor: {
-      type: String,
-      required: true,
-    },
   },
   { timestamps: true }
 );
