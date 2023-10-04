@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Medication = require("./models/medicationModel");
+const User = require("./models/userModel");
 
 const seedMedications = async () => {
   const commonMedications = [
@@ -27,7 +28,6 @@ const seedMedications = async () => {
       sig: "Instill 1 drop 2 every day.",
       capColor: "purple",
     },
-
     // Add more medications as needed
   ];
 
@@ -41,18 +41,27 @@ const seedMedications = async () => {
     // Clear existing medications (optional)
     await Medication.deleteMany();
 
+    // Find an existing user (you might need to adapt this based on your user creation logic)
+    const user = await User.findOne();
+
+    // If there's no user, you need to handle this case appropriately
+    if (!user) {
+      throw new Error("No user found. Please create a user first.");
+    }
+
+    // Map commonMedications to include the user reference
+    const commonMedicationsWithUser = commonMedications.map((medication) => ({
+      ...medication,
+      user: user._id, // Assign the user ID
+    }));
+
     // Insert new medications
-    await Medication.insertMany(commonMedications);
+    await Medication.insertMany(commonMedicationsWithUser);
 
     console.log("Medications seeded successfully!");
   } catch (error) {
     console.error("Error seeding medications:", error);
-  } finally {
-
-  }
+  } 
 };
 
 module.exports = seedMedications;
-
-
-
