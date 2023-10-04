@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dosesRoutes = require("./routes/doses");
 const userRoutes = require("./routes/user");
+const medicationsRoutes = require("./routes/medications"); 
 const seedMedications = require('./seed.js');
 const cors = require("cors");
 require('dotenv').config();
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/doses', dosesRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/medications', medicationsRoutes); 
 
 
 mongoose.connection.on('connected', () => {
