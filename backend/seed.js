@@ -48,8 +48,7 @@ const seedMedications = async () => {
   } catch (error) {
     console.error("Error seeding medications:", error);
   } finally {
-    // Disconnect from the database
-    await mongoose.disconnect();
+
   }
 };
 

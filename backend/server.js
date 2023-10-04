@@ -24,11 +24,25 @@ app.use((req, res, next) => {
 app.use('/api/doses', dosesRoutes);
 app.use('/api/user', userRoutes);
 
+
+mongoose.connection.on('connected', () => {
+  console.log('MongoDB connected');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
+
   .then(async () => {
     // Seed medications
     await seedMedications();
