@@ -6,8 +6,10 @@ const {
   getDoses,
   getDose
  } = require('../controllers/doseController');
-
+ const requireAuth = require('../middleware/requireAuth.js');
+router.use(requireAuth);
 // Get all doses
+// require Auth for all doses routes //
 router.get("/", getDoses);
 
 // Get single dose
