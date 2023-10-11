@@ -16,6 +16,8 @@ router.get("/", async (req, res) => {
 });
 
 // Assign a medication to a user
+// Assign a medication to a user
+// Assign a medication to a user
 router.post('/assign', requireAuth, async (req, res) => {
   try {
     const { medicationId } = req.body;
@@ -25,6 +27,11 @@ router.post('/assign', requireAuth, async (req, res) => {
     const medication = await Medication.findById(medicationId);
     if (!medication) {
       return res.status(404).json({ error: "Medication not found" });
+    }
+
+    // Ensure the user has a medications array
+    if (!user.medications) {
+      user.medications = [];
     }
 
     // Assign the medication to the user
@@ -37,5 +44,6 @@ router.post('/assign', requireAuth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 module.exports = router;
