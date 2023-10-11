@@ -38,8 +38,8 @@ const seedMedications = async () => {
       useUnifiedTopology: true,
     });
 
-    // Clear existing medications (optional)
-    await Medication.deleteMany();
+    // // Clear existing medications (optional)
+    // await Medication.deleteMany();
 
     // Find an existing user (you might need to adapt this based on your user creation logic)
     const user = await User.findOne();
