@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const Medication = require("../models/medicationModel");
 const User = require("../models/userModel"); // Import the User model
-const requireAuth = require('../middleware/requireAuth');
+const requireAuth = require("../middleware/requireAuth");
 
 // Get all medications
 router.get("/", async (req, res) => {
@@ -14,14 +14,38 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+// Get medications assigned to the logged-in user
+router.get('/assigned', requireAuth, async (req, res) => {
+  try {
+    const user = req.user; // Get the user from the authenticated request
+
+    // Assuming the User model has a field named 'assignedMedications' for assigned medications.
+    // If your field is named differently, adjust it here.
+    const assignedMedications = await Medication.find({ _id: { $in: user.assignedMedications } });
+
+    res.json(assignedMedications);
+    console.log(user.assignedMedications);
+    console.log(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Assign a medication to a user
 // Assign a medication to a user
 // Assign a medication to a user
-router.post('/assign', requireAuth, async (req, res) => {
+// Assign a medication to a user
+router.post("/assign", requireAuth, async (req, res) => {
   try {
     const { medicationId } = req.body;
     const user = req.user; // Get the user from the authenticated request
+
+    if (user.assignedMedications.includes(medicationId)) {
+      return res
+        .status(400)
+        .json({ error: "Medication is already assigned to the user" });
+    }
 
     // Find the medication
     const medication = await Medication.findById(medicationId);
@@ -30,12 +54,12 @@ router.post('/assign', requireAuth, async (req, res) => {
     }
 
     // Ensure the user has a medications array
-    if (!user.medications) {
-      user.medications = [];
+    if (!user.assignedMedications) {
+      user.assignedMedications = []; // Initialize the array if it doesn't exist
     }
 
     // Assign the medication to the user
-    user.medications.push(medication);
+    user.assignedMedications.push(medication); // Use .push() for adding the medication
     await user.save();
 
     res.json({ message: "Medication assigned successfully" });
@@ -44,6 +68,7 @@ router.post('/assign', requireAuth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 
 module.exports = router;
