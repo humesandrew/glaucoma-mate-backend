@@ -12,7 +12,14 @@ const requireAuth = async (req, res, next) => {
 
   try {
     const { _id } = jwt.verify(token, process.env.SECRET);
-    req.user = await User.findOne({ _id }).select("_id");
+
+    // Fetch the user and populate the assignedMedications field
+    req.user = await User.findById(_id).populate('assignedMedications').exec();
+
+    if (!req.user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
     next();
   } catch (error) {
     console.log(error);
