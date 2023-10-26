@@ -24,8 +24,8 @@ router.get('/assigned', requireAuth, async (req, res) => {
     const assignedMedications = await Medication.find({ _id: { $in: user.assignedMedications } });
 
     res.json(assignedMedications);
-    console.log(user.assignedMedications);
-    console.log(user);
+    // console.log(user.assignedMedications);
+    // console.log(user);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -66,6 +66,27 @@ router.post("/assign", requireAuth, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.delete('/assigned/:medicationId', requireAuth, async (req, res) => {
+  try {
+    const user = req.user; // Get the logged-in user
+    const { medicationId } = req.params;
+
+    // Check if the medication exists and is assigned to the user
+    if (!user.assignedMedications.includes(medicationId)) {
+      return res.status(404).json({ error: 'Medication not found or not assigned to the user.' });
+    }
+
+    // Remove the medication from the user's assignedMedications array
+    user.assignedMedications.pull(medicationId);
+    await user.save();
+
+    res.json({ message: 'Medication removed from the user.' });
+  } catch (error) {
+    console.error('Error removing medication from user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
