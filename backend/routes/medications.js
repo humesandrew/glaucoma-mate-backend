@@ -68,6 +68,17 @@ router.post("/assign", requireAuth, async (req, res) => {
   }
 });
 
+router.delete("/clear", requireAuth, async (req, res) => {
+  try {
+    // Delete all medications from the database
+    await Medication.deleteMany({});
+    res.json({ message: "All medications deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting medications:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 router.delete("/assigned/:medicationId", requireAuth, async (req, res) => {
   try {
     const user = req.user; // Get the logged-in user
