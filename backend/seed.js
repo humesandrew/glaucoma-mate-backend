@@ -38,27 +38,32 @@ const seedMedications = async () => {
       useUnifiedTopology: true,
     });
 
-    // // Clear existing medications (optional)
-    // await Medication.deleteMany();
+    // Check if medications already exist in the database
+    const existingMedications = await Medication.countDocuments();
 
-    // Find an existing user (you might need to adapt this based on your user creation logic)
-    const user = await User.findOne();
+    if (existingMedications === 0) {
+      // Data doesn't exist, so you can seed it
+      // Find an existing user (you might need to adapt this based on your user creation logic)
+      const user = await User.findOne();
 
-    // If there's no user, you need to handle this case appropriately
-    if (!user) {
-      throw new Error("No user found. Please create a user first.");
+      // If there's no user, you need to handle this case appropriately
+      if (!user) {
+        throw new Error("No user found. Please create a user first.");
+      }
+
+      // Map commonMedications to include the user reference
+      const commonMedicationsWithUser = commonMedications.map((medication) => ({
+        ...medication,
+        user: user._id, // Assign the user ID
+      }));
+
+      // Insert new medications
+      await Medication.insertMany(commonMedicationsWithUser);
+
+      console.log("Medications seeded successfully!");
+    } else {
+      console.log('Data already exists. No need to seed.');
     }
-
-    // Map commonMedications to include the user reference
-    const commonMedicationsWithUser = commonMedications.map((medication) => ({
-      ...medication,
-      user: user._id, // Assign the user ID
-    }));
-
-    // Insert new medications
-    await Medication.insertMany(commonMedicationsWithUser);
-
-    console.log("Medications seeded successfully!");
   } catch (error) {
     console.error("Error seeding medications:", error);
   } 
