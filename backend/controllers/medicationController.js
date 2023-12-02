@@ -13,9 +13,22 @@ const assignMedicationToUser = async (req, res) => {
       return res.status(404).json({ error: 'User or Medication not found.' });
     }
 
-    // Assign the medication to the user
-    user.medications.push(medication);
-    await user.save();
+    // // Assign the medication to the user
+    // user.medications.push(medication);
+    // await user.save();
+    console.log('User Medications Before:', user.medications);
+    console.log('Medication to Add:', medication);
+    
+    // Example of checking if the medication is already assigned before adding it
+if (!user.medications.some((assignedMed) => assignedMed.equals(medication._id))) {
+  user.medications.push(medication);
+  await user.save();
+}
+
+console.log('User medications after:', user.medications);
+
+
+
 
     res.json({ message: 'Medication assigned to user successfully.' });
   } catch (error) {
