@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 
 const requireAuth = async (req, res, next) => {
+  console.log('requireAuth middleware called');
   const { authorization } = req.headers;
 
   if (!authorization) {
