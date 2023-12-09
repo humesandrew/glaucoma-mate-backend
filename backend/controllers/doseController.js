@@ -1,5 +1,11 @@
 const Dose = require('../models/doseModel');
+const User = require('../models/userModel');
+const Medication = require('../models/medicationModel');
 const mongoose = require('mongoose');
+
+
+
+
 // Function for getting all doses
 const getDoses = async (req, res) => {
   const doses = await Dose.find().sort({ _id: -1 });
@@ -23,15 +29,28 @@ const getDose = async (req, res) => {
 
 // Function for creating a new dose
 const createDose = async (req, res) => {
-  const { name, dose, capColor } = req.body;
-  
+  const { medicationId, userId, timestamp } = req.body;
+
   try {
-    const createdDose = await Dose.create({ name, dose, capColor });
+    // Check if the provided medication and user IDs are valid
+    if (!mongoose.Types.ObjectId.isValid(medicationId) || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid Medication or User ID" });
+    }
+
+    // Check if the user is assigned to the medication
+    const user = await User.findById(userId);
+    if (!user || !user.assignedMedications.includes(medicationId)) {
+      return res.status(400).json({ error: "User not assigned to the specified medication" });
+    }
+
+    // Create the dose with the provided information
+    const createdDose = await Dose.create({ medication: medicationId, user: userId, timestamp });
     res.status(200).json(createdDose);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
-}
+};
+
 
 module.exports = {
   createDose,
