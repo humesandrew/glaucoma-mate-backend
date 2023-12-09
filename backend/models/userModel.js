@@ -16,7 +16,8 @@ const userSchema = new Schema({
   },
   // New field named assignedMedications, Type of each element in the array is a MongoDB ObjectID
   // Reference to the 'Medication' model //
-  assignedMedications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medication' }]
+  assignedMedications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medication' }],
+  dailyDoses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Dose'}]
 });
 
 // Static signup method
