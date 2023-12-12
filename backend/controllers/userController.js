@@ -6,7 +6,6 @@ const createToken = (_id) => {
 };
 
 // login user
-// login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -18,14 +17,12 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 // signup user
 const signupUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.signup(email, password);
-    // create a JWT //
     const token = createToken(user._id);
     res.status(200).json({ email, token });
   } catch (error) {
