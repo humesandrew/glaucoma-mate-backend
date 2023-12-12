@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 
 const requireAuth = async (req, res, next) => {
-  console.log('requireAuth middleware called');
+  console.log("requireAuth middleware called");
   const { authorization } = req.headers;
 
   if (!authorization) {
@@ -18,7 +18,7 @@ const requireAuth = async (req, res, next) => {
     console.log("Token Payload:", _id);
 
     // Fetch the user and populate the assignedMedications field
-    req.user = await User.findById(_id).populate('assignedMedications').exec();
+    req.user = await User.findById(_id).populate("assignedMedications").exec();
 
     if (!req.user) {
       // Debug: Log if user is not found
