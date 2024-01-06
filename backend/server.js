@@ -1,4 +1,6 @@
 const express = require("express");
+const admin = require("./config/firebase-config.js"); 
+const serviceAccount = require('./config/serviceAccountKey.json');
 const mongoose = require("mongoose");
 const dosesRoutes = require("./routes/doses");
 const userRoutes = require("./routes/user");
@@ -9,6 +11,8 @@ require('dotenv').config();
 
 const app = express();
 
+
+console.log('Firebase Admin SDK initialized successfully!');
 // Middleware to parse JSON data
 app.use(express.json());
 
