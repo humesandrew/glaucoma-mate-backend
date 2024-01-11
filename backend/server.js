@@ -12,7 +12,7 @@ require('dotenv').config();
 const app = express();
 
 
-console.log('Firebase Admin SDK initialized successfully!');
+
 // Middleware to parse JSON data
 app.use(express.json());
 
