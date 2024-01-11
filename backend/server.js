@@ -1,6 +1,6 @@
 const express = require("express");
 const admin = require("./config/firebase-config.js"); 
-const serviceAccount = require('./config/serviceAccountKey.json');
+// const serviceAccount = require('./config/serviceAccountKey.json');
 const mongoose = require("mongoose");
 const dosesRoutes = require("./routes/doses");
 const userRoutes = require("./routes/user");
