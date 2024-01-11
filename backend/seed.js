@@ -70,3 +70,6 @@ const seedMedications = async () => {
 };
 
 module.exports = seedMedications;
+
+
+// this is for updating //
