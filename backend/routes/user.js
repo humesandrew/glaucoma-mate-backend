@@ -10,7 +10,7 @@ const { signupUser, loginUser, firebaseLoginUser } = require('../controllers/use
 router.post('/login', loginUser);
 
 //firebase login route//
-router.get('/firebaseLogin', firebaseLoginUser)
+router.post('/firebaseLogin', firebaseLoginUser);
 
 // signup route //
 router.post('/signup', signupUser);
