@@ -28,7 +28,7 @@ const firebaseLoginUser = async (req, res) => {
 
     // Verify the Firebase token using Firebase Admin SDK
     const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-
+    console.log('Decoded Firebase Token:', decodedToken)
     // Now, you can access user information from decodedToken
     // and proceed with your logic
     // For example, you might want to fetch user data from the database:
