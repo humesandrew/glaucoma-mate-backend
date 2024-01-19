@@ -4,13 +4,13 @@ const router = express.Router();
 
 
 // controller functions
-const { signupUser, loginUser, firebaseLoginUser } = require('../controllers/userController');
+const { signupUser, loginUser} = require('../controllers/userController');
 
 //login route // 
 router.post('/login', loginUser);
 
 //firebase login route//
-router.post('/firebaseLogin', firebaseLoginUser);
+// router.post('/firebaseLogin', firebaseLoginUser);
 
 // signup route //
 router.post('/signup', signupUser);
