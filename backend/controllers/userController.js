@@ -7,19 +7,19 @@ const createToken = (_id) => {
 };
 console.log(admin);
 
-// login user
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.login(email, password);
-    const token = createToken(user._id);
-    res.status(200).json({ email: email, token: token, user_id: user._id });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+// // login user
+// const loginUser = async (req, res) => {
+//   const { email, password } = req.body;
+//   try {
+//     const user = await User.login(email, password);
+//     const token = createToken(user._id);
+//     res.status(200).json({ email: email, token: token, user_id: user._id });
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
 
-const firebaseLoginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -67,4 +67,4 @@ const signupUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, firebaseLoginUser, signupUser };
+module.exports = { loginUser, signupUser };
