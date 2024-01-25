@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
+const User = require('../models/userModel.js');
 
 const requireAuth = async (req, res, next) => {
   console.log("requireAuth middleware called");
