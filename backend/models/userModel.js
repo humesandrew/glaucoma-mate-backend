@@ -19,7 +19,11 @@ const userSchema = new Schema({
     unique: true,
   },
   assignedMedications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medication' }],
-  dailyDoses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Dose'}]
+  dailyDoses: [{type: mongoose.Schema.Types.ObjectId, ref: 'Dose'}],
+  authToken: {
+    type: String,
+    unique: true,
+  },
 });
 
 userSchema.statics.signup = async function (email, password, firebaseUid) {
