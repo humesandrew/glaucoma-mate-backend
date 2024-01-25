@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel.js");
+const admin = require("firebase-admin");
 
 const requireAuth = async (req, res, next) => {
   console.log("requireAuth middleware called");
@@ -12,13 +12,13 @@ const requireAuth = async (req, res, next) => {
   const token = authorization.split(" ")[1];
 
   try {
-    const { _id } = jwt.verify(token, process.env.SECRET);
+    const decodedToken = await admin.auth().verifyIdToken(token, true); // Pass `true` to enforce the RS256 algorithm
 
     // Debug: Log the token payload
-    console.log("Token Payload:", _id);
+    console.log("Token Payload:", decodedToken);
 
     // Fetch the user and populate the assignedMedications field
-    req.user = await User.findById(_id).populate("assignedMedications").exec();
+    req.user = await User.findById(decodedToken.uid).populate("assignedMedications").exec();
 
     if (!req.user) {
       // Debug: Log if user is not found
