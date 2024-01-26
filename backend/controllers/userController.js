@@ -62,6 +62,12 @@ const signupUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check if the user already exists
+    const existingUser = await User.findByEmail(email);
+    if (existingUser) {
+      throw new Error("Email already in use.");
+    }
+
     // Sign up the user using Firebase Authentication
     const userRecord = await admin.auth().createUser({
       email,
@@ -77,6 +83,7 @@ const signupUser = async (req, res) => {
     // Respond with the user data and the custom token
     res.status(200).json({ email, token });
   } catch (error) {
+    console.error('Error during signup:', error);
     res.status(400).json({ error: error.message });
   }
 };

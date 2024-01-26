@@ -28,6 +28,7 @@ userSchema.statics.signup = async function (email, password, firebaseUid) {
 
   try {
     const user = await this.create({ email, password, firebaseUid }); // Save user with firebaseUid
+    console.log("Creating user with email:", email, "and Firebase UID:", firebaseUid);
     return user;
   } catch (error) {
     console.error("Error while creating user:", error);
