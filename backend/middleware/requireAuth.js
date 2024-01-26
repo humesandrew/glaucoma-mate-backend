@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
 const User = require('../models/userModel.js');
 
