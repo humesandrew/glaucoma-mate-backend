@@ -78,28 +78,30 @@ userSchema.statics.login = async function (email, password, firebaseUid) {
     throw new Error("Email and password or Firebase UID are required.");
   }
 
+  let user;
+
   if (email && password) {
-    const user = await this.findOne({ email }).exec();
+    user = await this.findOne({ email }).exec();
+  } else if (firebaseUid) {
+    user = await this.findOne({
+      $or: [{ email }, { firebaseUid }]
+    }).exec();
+  }
 
-    if (!user) {
-      throw new Error("User not found.");
-    }
+  if (!user) {
+    throw new Error("User not found.");
+  }
 
+  if (email && password) {
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       throw new Error("Incorrect password.");
     }
-
-    return user;
-  } else if (firebaseUid) {
-    const user = await this.findOne({ firebaseUid }).exec();
-
-    if (!user) {
-      throw new Error("User not found.");
-    }
-
-    return user;
   }
+
+  return user;
 };
+
+
 
 module.exports = mongoose.model("User", userSchema);
