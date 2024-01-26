@@ -1,6 +1,5 @@
 const express = require("express");
 const admin = require("./config/firebase-config.js"); 
-// const serviceAccount = require('./config/serviceAccountKey.json');
 const mongoose = require("mongoose");
 const dosesRoutes = require("./routes/doses");
 const userRoutes = require("./routes/user");
@@ -10,8 +9,6 @@ const cors = require("cors");
 require('dotenv').config();
 
 const app = express();
-
-
 
 // Middleware to parse JSON data
 app.use(express.json());
@@ -30,7 +27,6 @@ app.use('/api/doses', dosesRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/medications', medicationsRoutes); 
 
-
 mongoose.connection.on('connected', () => {
   console.log('MongoDB connected');
 });
@@ -48,7 +44,6 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-
   .then(async () => {
     // Seed medications
     await seedMedications();
