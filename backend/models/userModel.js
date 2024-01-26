@@ -42,13 +42,18 @@ userSchema.statics.signup = async function (email, password, firebaseUid) {
     throw new Error("Email already in use.");
   }
 
+  // Check if the user is signing up with Firebase authentication
   if (firebaseUid) {
-    const existsByFirebaseUid = await this.findOne({ firebaseUid });
-    if (existsByFirebaseUid) {
-      throw new Error("Firebase UID already in use.");
+    try {
+      const user = await this.create({ email, firebaseUid }); // Save user with firebaseUid
+      return user;
+    } catch (error) {
+      console.error("Error while creating user with firebaseUid:", error);
+      throw new Error("Error while creating user with firebaseUid.");
     }
   }
 
+  // If not signing up with Firebase, proceed with regular email/password signup
   if (password) {
     if (typeof password !== "string") {
       throw new Error("Password must be a string.");
@@ -58,17 +63,15 @@ userSchema.statics.signup = async function (email, password, firebaseUid) {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
 
-      const user = await this.create({ email, password: hash, firebaseUid });
+      const user = await this.create({ email, password: hash });
       return user;
     } catch (error) {
       console.error("Error while hashing the password:", error);
       throw new Error("Error while hashing the password.");
     }
-  } else if (firebaseUid) {
-    const user = await this.create({ email, firebaseUid });
-    return user;
   }
 };
+
 
 userSchema.statics.login = async function (email, password, firebaseUid) {
   if ((!email || !password) && !firebaseUid) {
