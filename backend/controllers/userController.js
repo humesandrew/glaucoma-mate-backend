@@ -56,7 +56,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 const signupUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -76,7 +75,7 @@ const signupUser = async (req, res) => {
     console.log("Firebase UID:", userRecord.uid); // Log the firebaseUid
 
     // Call the signup function with email and Firebase UID
-    const user = await User.signup(email, userRecord.uid);
+    const user = await User.signup(email, null, userRecord.uid); // Pass null as password
 
     console.log("User signed up:", user); // Log the user object
 
