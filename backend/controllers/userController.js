@@ -57,7 +57,6 @@ const loginUser = async (req, res) => {
 };
 
 
-// Signup user
 const signupUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -74,8 +73,12 @@ const signupUser = async (req, res) => {
       password
     });
 
+    console.log("Firebase UID:", userRecord.uid); // Log the firebaseUid
+
     // Call the signup function with email and Firebase UID
     const user = await User.signup(email, userRecord.uid);
+
+    console.log("User signed up:", user); // Log the user object
 
     // Create a custom JWT token for your app
     const token = createToken(user._id);
@@ -87,5 +90,6 @@ const signupUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 module.exports = { loginUser, signupUser };
