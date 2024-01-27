@@ -49,7 +49,7 @@ const loginUser = async (req, res) => {
     const token = createToken(user._id);
 
     // Respond with the user data and the custom token
-    res.status(200).json({ email, token, user_id: user._id });
+    res.status(200).json({ email, token, firebaseToken: data.idToken, user_id: user._id });
   } catch (error) {
     console.error('Error during Firebase login:', error);
     res.status(400).json({ error: error.message });
