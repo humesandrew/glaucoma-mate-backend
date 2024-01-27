@@ -1,21 +1,10 @@
-const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
-const admin = require("firebase-admin");
-
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
-};
-
-// Login user
-const fetch = require('node-fetch');
-
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Authenticate user using Firebase Authentication REST API
     const response = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAts5SVgRfuCSV3kXNFOjWPsPd5hfX-TYY
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=YOUR_API_KEY
       `,
       {
         method: 'POST',
@@ -45,50 +34,10 @@ const loginUser = async (req, res) => {
       user = await User.signup(email, userRecord.uid);
     }
 
-    // Create a custom JWT token for your app
-    const token = createToken(user._id);
-
-    // Respond with the user data and the custom token
-    res.status(200).json({ email, token, firebaseToken: data.idToken, user_id: user._id });
+    // Respond with the user data and the Firebase token
+    res.status(200).json({ email, firebaseToken: data.idToken, user_id: user._id });
   } catch (error) {
     console.error('Error during Firebase login:', error);
     res.status(400).json({ error: error.message });
   }
 };
-
-const signupUser = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Check if the user already exists
-    const existingUser = await User.findByEmail(email);
-    if (existingUser) {
-      throw new Error("Email already in use.");
-    }
-
-    // Sign up the user using Firebase Authentication
-    const userRecord = await admin.auth().createUser({
-      email,
-      password
-    });
-
-    console.log("Firebase UID:", userRecord.uid); // Log the firebaseUid
-
-    // Call the signup function with email and Firebase UID
-    const user = await User.signup(email, null, userRecord.uid); // Pass null as password
-
-    console.log("User signed up:", user); // Log the user object
-
-    // Create a custom JWT token for your app
-    const token = createToken(user._id);
-
-    // Respond with the user data and the custom token
-    res.status(200).json({ email, token });
-  } catch (error) {
-    console.error('Error during signup:', error);
-    res.status(400).json({ error: error.message });
-  }
-};
-
-
-module.exports = { loginUser, signupUser };
