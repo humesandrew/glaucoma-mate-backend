@@ -4,7 +4,7 @@ const loginUser = async (req, res) => {
   try {
     // Authenticate user using Firebase Authentication REST API
     const response = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=YOUR_API_KEY
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAts5SVgRfuCSV3kXNFOjWPsPd5hfX-TYY
       `,
       {
         method: 'POST',
