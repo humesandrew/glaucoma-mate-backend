@@ -1,15 +1,22 @@
 const admin = require("firebase-admin");
-const User = require('../models/userModel.js');
+const User = require("../models/userModel.js");
+
+const extractTokenFromHeaders = (headers) => {
+  if (!headers || !headers.authorization) {
+    return null;
+  }
+  const token = headers.authorization.split(" ")[1];
+  return token;
+};
 
 const requireAuth = async (req, res, next) => {
   console.log("requireAuth middleware called");
-  const { authorization } = req.headers;
 
-  if (!authorization) {
+  const token = extractTokenFromHeaders(req.headers);
+
+  if (!token) {
     return res.status(401).json({ error: "Authorization token required." });
   }
-
-  const token = authorization.split(" ")[1];
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
@@ -28,10 +35,8 @@ const requireAuth = async (req, res, next) => {
     console.log("User found:", req.user);
     next();
   } catch (error) {
-    console.error(error);
-
-    console.log("Request is not authorized");
-    res.status(401).json({ error: "Request is not authorized" });
+    console.error("Error verifying Firebase ID token:", error);
+    return res.status(401).json({ error: "Invalid or expired token." });
   }
 };
 
