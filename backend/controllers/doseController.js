@@ -27,8 +27,7 @@ const getDose = async (req, res) => {
 
 // Function for creating a new dose
 const createDose = async (req, res) => {
-  const { medicationId, timestamp } = req.body;
-  const { uid } = req.user; // Assuming you're sending Firebase UID in the request
+  const { medicationId, timestamp, user } = req.body; // Retrieve user from request body
   
   try {
     // Check if the provided medication ID is valid
@@ -68,7 +67,7 @@ const createDose = async (req, res) => {
     // Create the dose with the provided information
     const createdDose = await Dose.create({
       medication: medicationId,
-      user: uid, // Use Firebase UID as user ID
+      user, // Use the user ID from the request body
       timestamp: doseTimestamp.toDate(), // Convert moment object to Date
     });
     res.status(200).json(createdDose);
@@ -76,6 +75,7 @@ const createDose = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 module.exports = {
