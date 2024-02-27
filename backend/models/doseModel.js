@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 // Define the schema for the Dose model
 const doseSchema = new mongoose.Schema({
   // Reference to the User model, indicating the user who took the dose
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-
+  user: { type: String, required: true }, // Change type to String
+  
   // Reference to the Medication model, indicating the medication that was taken
   medication: { type: mongoose.Schema.Types.ObjectId, ref: 'Medication', required: true },
 
