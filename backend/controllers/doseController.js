@@ -27,23 +27,13 @@ const getDose = async (req, res) => {
 
 // Function for creating a new dose
 const createDose = async (req, res) => {
-  const { medicationId, userId, timestamp } = req.body;
-
+  const { medicationId, timestamp } = req.body;
+  const { uid } = req.user; // Assuming you're sending Firebase UID in the request
+  
   try {
-    // Check if the provided medication and user IDs are valid
-    if (
-      !mongoose.Types.ObjectId.isValid(medicationId) ||
-      !mongoose.Types.ObjectId.isValid(userId)
-    ) {
-      return res.status(400).json({ error: "Invalid Medication or User ID" });
-    }
-
-    // Check if the user is assigned to the medication
-    const user = await User.findById(userId);
-    if (!user || !user.assignedMedications.includes(medicationId)) {
-      return res
-        .status(400)
-        .json({ error: "User not assigned to the specified medication" });
+    // Check if the provided medication ID is valid
+    if (!mongoose.Types.ObjectId.isValid(medicationId)) {
+      return res.status(400).json({ error: "Invalid Medication ID" });
     }
 
     // Check if the maximum dosage has been reached for the calendar day
@@ -78,7 +68,7 @@ const createDose = async (req, res) => {
     // Create the dose with the provided information
     const createdDose = await Dose.create({
       medication: medicationId,
-      user: userId,
+      user: uid, // Use Firebase UID as user ID
       timestamp: doseTimestamp.toDate(), // Convert moment object to Date
     });
     res.status(200).json(createdDose);
@@ -86,6 +76,7 @@ const createDose = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 module.exports = {
   createDose,
