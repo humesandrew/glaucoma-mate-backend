@@ -62,10 +62,10 @@ const seedMedications = async () => {
       useUnifiedTopology: true,
     });
 
-    // Check if medications already exist in the database
-    const existingMedications = await Medication.countDocuments();
+    // Retrieve existing medications
+    const existingMedications = await Medication.find();
 
-    if (existingMedications === 0) {
+    if (existingMedications.length === 0) {
       // Data doesn't exist, so you can seed it
       const user = await User.findOne();
 
@@ -84,13 +84,42 @@ const seedMedications = async () => {
 
       console.log("Medications seeded successfully!");
     } else {
-      console.log("Data already exists. No need to seed.");
+      // Data already exists, update medications if necessary
+      commonMedications.forEach(async (newMedication) => {
+        const existingMedication = existingMedications.find(
+          (m) => m.name === newMedication.name
+        );
+
+        if (existingMedication) {
+          // Update existing medication details
+          existingMedication.dosage = newMedication.dosage;
+          existingMedication.sig = newMedication.sig;
+          existingMedication.capColor = newMedication.capColor;
+
+          await existingMedication.save();
+          console.log(`Updated medication: ${existingMedication.name}`);
+        } else {
+          // Medication doesn't exist, insert it
+          const user = await User.findOne();
+          if (!user) {
+            throw new Error("No user found. Please create a user first.");
+          }
+
+          const medicationToInsert = {
+            ...newMedication,
+            user: user._id,
+          };
+
+          await Medication.create(medicationToInsert);
+          console.log(`Inserted new medication: ${medicationToInsert.name}`);
+        }
+      });
+
+      console.log("Medications updated successfully!");
     }
   } catch (error) {
-    console.error("Error seeding medications:", error);
+    console.error("Error seeding/updating medications:", error);
   }
 };
 
 module.exports = seedMedications;
-
-
