@@ -20,17 +20,13 @@ const medicationSchema = new Schema(
       type: String,
       required: true,
     },
-    // Reference to the User model
+    // Change the type to String to store the user's ID as a string
     user: {
-        // ObjectId type to store the unique identifier of the user //
-      type: Schema.Types.ObjectId,
-       // Ref indicates the referenced model //
-      ref: 'User',
-       // The user field is required, as each medication should belong to a user //
+      type: String,
       required: true,
     },
   },
-    // Enable timestamps to automatically track creation and update times //
+  // Enable timestamps to automatically track creation and update times
   { timestamps: true }
 );
 
