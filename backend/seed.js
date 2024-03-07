@@ -17,9 +17,15 @@ const seedMedications = async () => {
       capColor: "teal",
     },
     {
+      name: "Xalatan",
+      dosage: 1,
+      sig: "Instill 1 drop every night at bedtime.",
+      capColor: "teal",
+    },
+    {
       name: "Timolol",
       dosage: 2,
-      sig: "Instill 1 drop 2 times every day.",
+      sig: "Instill 1 drop every night at bedtime.",
       capColor: "yellow",
     },
     {
