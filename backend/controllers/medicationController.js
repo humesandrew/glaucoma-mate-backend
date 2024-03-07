@@ -6,15 +6,21 @@ const assignMedicationToUser = async (req, res) => {
     console.log("Entered assignMedicationToUser route");
     const { userId, medicationId } = req.body;
     console.log("Request Body:", req.body);
+    
+    // Validate userId format
+    if (typeof userId !== 'string') {
+      return res.status(400).json({ error: "Invalid userId format" });
+    }
+
     // Fetch the user and medication
-    const user = await User.findById(userId);
+    const user = await User.findOne({ _id: userId });
     const medication = await Medication.findById(medicationId);
 
     if (!user || !medication) {
       return res.status(404).json({ error: "User or Medication not found." });
     }
 
-    // // Assign the medication to the user
+    // Assign the medication to the user
     console.log("User Medications Before:", user.assignedMedications);
     console.log("Medication to Add:", medication);
 
