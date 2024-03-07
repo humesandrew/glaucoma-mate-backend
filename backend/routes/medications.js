@@ -35,47 +35,9 @@ router.get("/assigned", requireAuth, async (req, res) => {
 });
 
 
-//using medicationController instead// 
-
 
 router.post("/assign", requireAuth, MedicationController.assignMedicationToUser);
 
-
-// // Assign a medication to a user
-// router.post("/assign", requireAuth, async (req, res) => {
-//   console.log('assignMedicationToUser route called')
-//   try {
-//     const { medicationId } = req.body;
-//     const user = req.user; // Get the user from the authenticated request
-
-//     if (user.assignedMedications.includes(medicationId)) {
-//       return res
-//         .status(400)
-//         .json({ error: "Medication is already assigned to the user" });
-//     }
-
-//     // Find the medication
-//     const medication = await Medication.findById(medicationId);
-//     if (!medication) {
-//       return res.status(404).json({ error: "Medication not found" });
-//     }
-
-//     // Ensure the user has a medications array
-//     if (!user.assignedMedications) {
-//       user.assignedMedications = []; // Initialize the array if it doesn't exist
-//     }
-
-//     // Assign the medication to the user
-//     user.assignedMedications.push(medication); // Use .push() for adding the medication
-//     await user.save();
-
-//     res.json({ message: "Medication assigned successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
-// // End assign a medication to a user
 
 router.delete("/clear", requireAuth, async (req, res) => {
   try {
