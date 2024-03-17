@@ -14,7 +14,7 @@ const assignMedicationToUser = async (req, res) => {
     }
 
     // Fetch the user and medication
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findById(userId); // Update the query to use findById
     const medication = await Medication.findById(medicationId);
 
     if (!user || !medication) {
