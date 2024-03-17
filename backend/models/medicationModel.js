@@ -20,9 +20,10 @@ const medicationSchema = new Schema(
       type: String,
       required: true,
     },
-    // Change the type to String to store the user's ID as a string
+    // Change the type to ObjectId to reference the User model
     user: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // Reference the User model
       required: true,
     },
   },
