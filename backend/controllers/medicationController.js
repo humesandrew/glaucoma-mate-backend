@@ -1,5 +1,6 @@
 const Medication = require("../models/medicationModel");
 const User = require("../models/userModel");
+const mongoose = require('mongoose');
 
 const assignMedicationToUser = async (req, res) => {
   try {
@@ -8,7 +9,7 @@ const assignMedicationToUser = async (req, res) => {
     console.log("Request Body:", req.body);
     
     // Validate userId format
-    if (typeof userId !== 'string') {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid userId format" });
     }
 
