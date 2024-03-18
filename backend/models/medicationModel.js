@@ -20,10 +20,9 @@ const medicationSchema = new Schema(
       type: String,
       required: true,
     },
-    // Change the type to ObjectId to reference the User model
+    // Change the type to String to store the Firebase UID
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Reference the User model
+      type: String,
       required: true,
     },
   },
