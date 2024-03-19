@@ -15,7 +15,12 @@ const assignMedicationToUser = async (req, res) => {
 
     // Fetch the user and medication
     const user = await User.findById(userId); // Update the query to use findById
+    console.log("User found in controller:", user);
+    console.log("User Object in controller:", user);
     const medication = await Medication.findById(medicationId);
+    console.log("Medication found in controller:", medication);
+    console.log("Medication Object in controller:", medication);
+    
 
     if (!user || !medication) {
       return res.status(404).json({ error: "User or Medication not found." });
