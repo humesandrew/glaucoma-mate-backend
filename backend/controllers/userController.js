@@ -40,9 +40,8 @@ const loginUser = async (req, res) => {
     let user = await User.findByEmail(email);
 
     if (!user) {
-      // If the user doesn't exist, create a new user in the database
-      const userRecord = await admin.auth().getUserByEmail(email);
-      user = await User.signup(email, userRecord.uid);
+      // Instead of creating a new user, return an error indicating the user was not found
+      return res.status(404).json({ error: "User not found. Please signup first." });
     }
 
     // Create a custom JWT token for your app
