@@ -1,10 +1,10 @@
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
-};
+// const createToken = (_id) => {
+//   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+// };
 
 // Login user
 const fetch = require('node-fetch');
@@ -45,49 +45,39 @@ const loginUser = async (req, res) => {
     }
 
     // Create a custom JWT token for your app
-    const token = createToken(user._id);
+    // const token = createToken(user._id);
 
     // Respond with the user data and the custom token
-    res.status(200).json({ email, token, firebaseToken: data.idToken, user_id: user._id });
+    res.status(200).json({ email, firebaseToken: data.idToken, firebaseUid: user.firebaseUid });
   } catch (error) {
     console.error('Error during Firebase login:', error);
     res.status(400).json({ error: error.message });
   }
 };
 
+// Function to handle new user signup
 const signupUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if the user already exists
+    // Check if the user already exists in MongoDB
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
       throw new Error("Email already in use.");
     }
 
-    // Sign up the user using Firebase Authentication
-    const userRecord = await admin.auth().createUser({
-      email,
-      password
-    });
+    // Create a new user in Firebase Authentication
+    const userRecord = await admin.auth().createUser({ email, password });
 
-    console.log("Firebase UID:", userRecord.uid); // Log the firebaseUid
+    // Create a new user in MongoDB with the Firebase UID
+    const newUser = await User.signup(email, null, userRecord.uid); // Assuming your User.signup can handle null passwords for Firebase users
 
-    // Call the signup function with email and Firebase UID
-    const user = await User.signup(email, null, userRecord.uid); // Pass null as password
-
-    console.log("User signed up:", user); // Log the user object
-
-    // Create a custom JWT token for your app
-    const token = createToken(user._id);
-
-    // Respond with the user data and the custom token
-    res.status(200).json({ email, token });
+    // const token = createToken(newUser.firebaseUid);
+    res.status(200).json({ email: newUser.email, firebaseUid: newUser.firebaseUid });
   } catch (error) {
-    console.error('Error during signup:', error);
+    console.error('Error during user signup:', error);
     res.status(400).json({ error: error.message });
   }
 };
-
 
 module.exports = { loginUser, signupUser };
