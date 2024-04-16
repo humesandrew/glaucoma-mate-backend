@@ -1,58 +1,35 @@
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
-};
+// Initialize Firebase Admin SDK
+// Assuming you've already configured Firebase Admin elsewhere in your project
 
-// Login user
-const fetch = require('node-fetch');
-
+// Function to handle user login using Firebase ID token
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+// Use the ID token sent from the client to perform operations
+const { authToken } = req.headers;  // Expect authToken in the request headers
 
-  try {
-    // Authenticate user using Firebase Authentication REST API
-    const response = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAts5SVgRfuCSV3kXNFOjWPsPd5hfX-TYY
-      `,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          returnSecureToken: true,
-        }),
-      }
-    );
+try {
+    // Verify the ID token using Firebase Admin SDK
+    const decodedToken = await admin.auth().verifyIdToken(authToken);
+    const uid = decodedToken.uid;
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error.message);
-    }
-
-    // Check if the user exists in the database
-    let user = await User.findByEmail(email);
-
+    // Check if the user exists in MongoDB
+    const user = await User.findOne({ firebaseUid: uid });
     if (!user) {
-      // Instead of creating a new user, return an error indicating the user was not found
-      return res.status(404).json({ error: "User not found. Please signup first." });
+        return res.status(404).json({ error: "User not found. Please signup first." });
     }
 
-    // Create a custom JWT token for your app
-    const token = createToken(user._id);
-
-    // Respond with the user data and the custom token
-    res.status(200).json({ email, token, firebaseToken: data.idToken, user_id: user._id, firebaseUid: user.firebaseUid });
-  } catch (error) {
+    // Respond with the user data
+    res.status(200).json({
+        email: user.email,
+        firebaseUid: user.firebaseUid
+    });
+} catch (error) {
     console.error('Error during Firebase login:', error);
-    res.status(400).json({ error: error.message });
-  }
+    res.status(401).json({ error: "Unauthorized - " + error.message });
+}
+
 };
 
 // Function to handle new user signup
@@ -61,23 +38,34 @@ const signupUser = async (req, res) => {
 
   try {
     // Check if the user already exists in MongoDB
-    const existingUser = await User.findByEmail(email);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      throw new Error("Email already in use.");
+      return res.status(400).json({ error: "Email already in use." });
     }
 
     // Create a new user in Firebase Authentication
     const userRecord = await admin.auth().createUser({ email, password });
 
-    // Create a new user in MongoDB with the Firebase UID
-    const newUser = await User.signup(email, null, userRecord.uid); // Assuming your User.signup can handle null passwords for Firebase users
+    // Sign in the user immediately to get a token
+    const customToken = await admin.auth().createCustomToken(userRecord.uid);
 
-    const token = createToken(newUser.firebaseUid);
-    res.status(200).json({ email: newUser.email, token, firebaseUid: newUser.firebaseUid });
+    // Create a new user in MongoDB with the Firebase UID
+    const newUser = await User.create({
+      email: email,
+      firebaseUid: userRecord.uid
+    });
+
+    // You could return the custom token or exchange it for an ID token using the client SDK
+    res.status(201).json({
+      email: newUser.email,
+      firebaseUid: newUser.firebaseUid,
+      authToken: customToken  // This is the custom token, which should be used on the client to obtain an ID token
+    });
   } catch (error) {
     console.error('Error during user signup:', error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 module.exports = { loginUser, signupUser };
