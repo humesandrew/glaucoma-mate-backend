@@ -2,20 +2,20 @@ const User = require("../models/userModel");
 const admin = require("firebase-admin");
 
 // Function to handle user login using Firebase ID token
+// Function to handle user login using Firebase ID token
 const loginUser = async (req, res) => {
-    const authToken = req.headers.authorization?.split('Bearer ')[1]; // Properly extract the token
+    const authToken = req.headers.authorization?.split('Bearer ')[1];
 
     if (!authToken) {
         console.error("No authToken provided.");
         return res.status(401).json({ error: "No authToken provided." });
     }
 
-    console.log("Attempting to verify ID token");
     try {
         const decodedToken = await admin.auth().verifyIdToken(authToken);
         console.log("Token verified, UID:", decodedToken.uid);
 
-        // Check if the user exists in MongoDB
+        // Retrieve the user from MongoDB using the UID from Firebase
         const user = await User.findOne({ firebaseUid: decodedToken.uid });
         if (!user) {
             console.error("User not found in database, UID:", decodedToken.uid);
@@ -33,9 +33,11 @@ const loginUser = async (req, res) => {
     }
 };
 
+
+// Function to handle new user signup
 // Function to handle new user signup
 const signupUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { email } = req.body; // Remove the password from request body handling
     console.log("Signup attempt for email:", email);
 
     try {
@@ -45,15 +47,19 @@ const signupUser = async (req, res) => {
             return res.status(400).json({ error: "Email already in use." });
         }
 
-        console.log("Creating user in Firebase for email:", email);
-        const userRecord = await admin.auth().createUser({ email, password });
+        // Create a new user in Firebase Authentication
+        const userRecord = await admin.auth().createUser({ email });
 
-        console.log("Creating user in MongoDB for UID:", userRecord.uid);
+        // Log for debugging
+        console.log("Firebase user created with UID:", userRecord.uid);
+
+        // Create a new user in MongoDB with the Firebase UID
         const newUser = await User.create({
             email: email,
             firebaseUid: userRecord.uid
         });
 
+        // Respond with user data
         res.status(201).json({
             email: newUser.email,
             firebaseUid: newUser.firebaseUid
@@ -63,5 +69,6 @@ const signupUser = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
 
 module.exports = { loginUser, signupUser };
