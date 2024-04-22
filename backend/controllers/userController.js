@@ -45,7 +45,6 @@ const signupUser = async (req, res) => {
     console.log("Signup attempt for email:", email);
 
     try {
-        // Check if the email is already in use in your MongoDB
         console.log("Checking if email is already in use:", email);
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -53,32 +52,21 @@ const signupUser = async (req, res) => {
             return res.status(400).json({ error: "Email already in use." });
         }
 
-        // Attempt to create the user in Firebase
         console.log("Creating user in Firebase for email:", email);
-        try {
-            const userRecord = await admin.auth().createUser({ email });
-            console.log("Firebase user created with UID:", userRecord.uid);
+        const userRecord = await admin.auth().createUser({ email });
+        console.log("Firebase user created with UID:", userRecord.uid);
 
-            // Create the user in MongoDB
-            console.log("Creating user in MongoDB for UID:", userRecord.uid);
-            const newUser = await User.create({
-                email: email,
-                firebaseUid: userRecord.uid
-            });
+        console.log("Creating user in MongoDB for UID:", userRecord.uid);
+        const newUser = await User.create({
+            email: email,
+            firebaseUid: userRecord.uid
+        });
 
-            console.log("MongoDB user created with email:", newUser.email);
-            res.status(201).json({
-                email: newUser.email,
-                firebaseUid: newUser.firebaseUid
-            });
-        } catch (firebaseError) {
-            console.error('Firebase signup error:', firebaseError);
-            if (firebaseError.code === 'auth/email-already-exists') {
-                return res.status(400).json({ error: "Email is already registered in Firebase." });
-            } else {
-                return res.status(400).json({ error: firebaseError.message });
-            }
-        }
+        console.log("MongoDB user created with email:", newUser.email);
+        res.status(201).json({
+            email: newUser.email,
+            firebaseUid: newUser.firebaseUid
+        });
     } catch (error) {
         console.error('Error during user signup:', error);
         res.status(400).json({ error: error.message });
