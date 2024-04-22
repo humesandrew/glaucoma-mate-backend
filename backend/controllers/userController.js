@@ -5,6 +5,7 @@ const admin = require("firebase-admin");
 // Function to handle user login using Firebase ID token
 const loginUser = async (req, res) => {
     const authToken = req.headers.authorization?.split('Bearer ')[1];
+    console.log("Received authToken:", authToken);  // Log the received token for debugging
 
     if (!authToken) {
         console.error("No authToken provided.");
@@ -12,17 +13,19 @@ const loginUser = async (req, res) => {
     }
 
     try {
+        console.log("Attempting to verify ID token");
         const decodedToken = await admin.auth().verifyIdToken(authToken);
         console.log("Token verified, UID:", decodedToken.uid);
 
-        // Retrieve the user from MongoDB using the UID from Firebase
+        console.log("Looking for user in DB with UID:", decodedToken.uid);
         const user = await User.findOne({ firebaseUid: decodedToken.uid });
+        
         if (!user) {
             console.error("User not found in database, UID:", decodedToken.uid);
             return res.status(404).json({ error: "User not found. Please signup first." });
         }
 
-        // Respond with the user data
+        console.log("User found:", user.email); // Log user email for confirmation
         res.status(200).json({
             email: user.email,
             firebaseUid: user.firebaseUid
@@ -34,32 +37,32 @@ const loginUser = async (req, res) => {
 };
 
 
+
 // Function to handle new user signup
 // Function to handle new user signup
 const signupUser = async (req, res) => {
-    const { email } = req.body; // Remove the password from request body handling
+    const { email } = req.body;
     console.log("Signup attempt for email:", email);
 
     try {
+        console.log("Checking if email is already in use:", email);
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             console.error("Email already in use:", email);
             return res.status(400).json({ error: "Email already in use." });
         }
 
-        // Create a new user in Firebase Authentication
+        console.log("Creating user in Firebase for email:", email);
         const userRecord = await admin.auth().createUser({ email });
-
-        // Log for debugging
         console.log("Firebase user created with UID:", userRecord.uid);
 
-        // Create a new user in MongoDB with the Firebase UID
+        console.log("Creating user in MongoDB for UID:", userRecord.uid);
         const newUser = await User.create({
             email: email,
             firebaseUid: userRecord.uid
         });
 
-        // Respond with user data
+        console.log("MongoDB user created with email:", newUser.email);
         res.status(201).json({
             email: newUser.email,
             firebaseUid: newUser.firebaseUid
