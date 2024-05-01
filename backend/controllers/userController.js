@@ -32,28 +32,28 @@ const loginUser = async (req, res) => {
 // Function to handle new user signup
 const signupUser = async (req, res) => {
     const { email } = req.body;
-    console.log("Mongo signup attempt for email:", email);
+    console.log("Signup attempt for email:", email);
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.error("Mongo signup error: Email already in use,", email);
+            console.error("Signup error: Email already in use,", email);
             return res.status(400).json({ error: "Backend Email already in use." });
         }
 
         const userRecord = await admin.auth().createUser({ email });
-        console.log("Backend signup: Firebase user created with UID:", userRecord.uid);
+        console.log("Signup: Firebase user created with UID:", userRecord.uid);
 
         const newUser = await User.create({ email, firebaseUid: userRecord.uid });
-        console.log("Backend signup: MongoDB user created with email:", newUser.email);
+        console.log("Signup: MongoDB user created with email:", newUser.email);
 
         res.status(201).json({ email: newUser.email, firebaseUid: newUser.firebaseUid });
     } catch (error) {
-        console.error('Backend signup error:', error);
+        console.error('Signup error:', error);
         if (error.errorInfo && error.errorInfo.code === 'auth/email-already-exists') {
-            res.status(400).json({ error: "Backend firebase: Email already exists." });
+            res.status(400).json({ error: "Firebase: Email already exists." });
         } else {
-            res.status(400).json({ error: error.message || 'Backend failed to create user.' });
+            res.status(400).json({ error: error.message || 'Failed to create user.' });
         }
     }
 };
