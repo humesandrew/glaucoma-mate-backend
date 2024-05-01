@@ -35,27 +35,35 @@ const signupUser = async (req, res) => {
     console.log("Mongo signup attempt for email:", email);
 
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            console.error("Mongo signup error: Email already in use,", email);
-            return res.status(400).json({ error: "Backend Email already in use." });
+        // Check MongoDB first to ensure no user exists
+        const existingMongoUser = await User.findOne({ email });
+        if (existingMongoUser) {
+            console.error("Backend signup error: MongoDB Email already in use,", email);
+            return res.status(400).json({ error: "Backend Email already in use in MongoDB." });
         }
 
-        const userRecord = await admin.auth().createUser({ email });
-        console.log("Backend signup: Firebase user created with UID:", userRecord.uid);
+        // Attempt to create user in Firebase
+        try {
+            const userRecord = await admin.auth().createUser({ email });
+            console.log("Signup: Firebase user created with UID:", userRecord.uid);
 
-        const newUser = await User.create({ email, firebaseUid: userRecord.uid });
-        console.log("Backend signup: MongoDB user created with email:", newUser.email);
-
-        res.status(201).json({ email: newUser.email, firebaseUid: newUser.firebaseUid });
+            // Now attempt to create the user in MongoDB
+            const newUser = await User.create({ email, firebaseUid: userRecord.uid });
+            console.log("Signup: MongoDB user created with email:", newUser.email);
+            res.status(201).json({ email: newUser.email, firebaseUid: newUser.firebaseUid });
+        } catch (firebaseError) {
+            console.error('Firebase signup error:', firebaseError);
+            if (firebaseError.errorInfo && firebaseError.errorInfo.code === 'auth/email-already-exists') {
+                res.status(400).json({ error: "Firebase: Email already exists." });
+            } else {
+                throw firebaseError;  // Rethrow to be caught by outer catch
+            }
+        }
     } catch (error) {
-        console.error('Backend signup error:', error);
-        if (error.errorInfo && error.errorInfo.code === 'auth/email-already-exists') {
-            res.status(400).json({ error: "Backend firebase: Email already exists." });
-        } else {
-            res.status(400).json({ error: error.message || 'Backend failed to create user.' });
-        }
+        console.error('Signup error:', error);
+        res.status(400).json({ error: error.message || 'Failed to create user.' });
     }
 };
+
 
 module.exports = { loginUser, signupUser };
