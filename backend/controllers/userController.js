@@ -31,19 +31,33 @@ const loginUser = async (req, res) => {
 
 // Function to handle new user signup
 const signupUser = async (req, res) => {
-    const { email } = req.body;
+    const { email, firebaseUid } = req.body; // Expect firebaseUid to be provided
     console.log("Signup attempt for email:", email);
 
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            console.error("Signup error: Email already in use,", email);
+        // Check if the user already exists in MongoDB
+        const existingMongoUser = await User.findOne({ email });
+        if (existingMongoUser) {
+            console.error("Signup error: Email already in use in MongoDB,", email);
             return res.status(400).json({ error: "Backend Email already in use." });
         }
 
-        const userRecord = await admin.auth().createUser({ email });
-        console.log("Signup: Firebase user created with UID:", userRecord.uid);
+        let userRecord;
+        // If firebaseUid is provided, attempt to retrieve the existing Firebase user
+        if (firebaseUid) {
+            try {
+                userRecord = await admin.auth().getUser(firebaseUid);
+            } catch (error) {
+                // User does not exist in Firebase, so create a new one
+                userRecord = await admin.auth().createUser({ email });
+            }
+        } else {
+            // If no firebaseUid provided, create a new Firebase user
+            userRecord = await admin.auth().createUser({ email });
+        }
+        console.log("Signup: Firebase user ensured/created with UID:", userRecord.uid);
 
+        // Create the MongoDB user with the Firebase UID
         const newUser = await User.create({ email, firebaseUid: userRecord.uid });
         console.log("Signup: MongoDB user created with email:", newUser.email);
 
@@ -57,5 +71,6 @@ const signupUser = async (req, res) => {
         }
     }
 };
+
 
 module.exports = { loginUser, signupUser };
