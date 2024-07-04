@@ -70,7 +70,11 @@ const createDose = async (req, res) => {
       user, // Use the user ID from the request body
       timestamp: doseTimestamp.toDate(), // Convert moment object to Date
     });
-    res.status(200).json(createdDose);
+      // Update the user's dailyDoses array
+      await User.findByIdAndUpdate(user, { $push: { dailyDoses: createdDose._id } });
+
+      res.status(200).json(createdDose);
+   
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
