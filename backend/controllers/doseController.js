@@ -51,9 +51,10 @@ const createDose = async (req, res) => {
     const startOfDay = doseTimestamp.startOf("day").toDate();
     const endOfDay = doseTimestamp.endOf("day").toDate();
 
-    // Query the database for all doses of the specified medication within the calendar day
+    // Query the database for all doses of the specified medication within the calendar day for the specific user
     const dosesForMedication = await Dose.find({
       medication: medicationId,
+      user: user, // Include the user in the query
       timestamp: { $gte: startOfDay, $lte: endOfDay },
     });
 
@@ -70,17 +71,16 @@ const createDose = async (req, res) => {
       user, // Use the user ID from the request body
       timestamp: doseTimestamp.toDate(), // Convert moment object to Date
     });
-      // Update the user's dailyDoses array
-      await User.findByIdAndUpdate(user, { $push: { dailyDoses: createdDose._id } });
 
-      res.status(200).json(createdDose);
+    // Update the user's dailyDoses array
+    await User.findByIdAndUpdate(user, { $push: { dailyDoses: createdDose._id } });
+
+    res.status(200).json(createdDose);
    
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
-
-
 
 module.exports = {
   createDose,
