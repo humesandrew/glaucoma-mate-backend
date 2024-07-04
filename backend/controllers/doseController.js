@@ -27,9 +27,15 @@ const getDose = async (req, res) => {
 
 // Function for creating a new dose
 const createDose = async (req, res) => {
-  const { medicationId, timestamp, user } = req.body; // Retrieve user from request body
+  const { medicationId, timestamp, user: firebaseUid } = req.body; // Retrieve user from request body
   
   try {
+    // Find the user by Firebase UID
+    const user = await User.findByFirebaseUid(firebaseUid);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     // Check if the provided medication ID is valid
     if (!mongoose.Types.ObjectId.isValid(medicationId)) {
       return res.status(400).json({ error: "Invalid Medication ID" });
@@ -54,7 +60,7 @@ const createDose = async (req, res) => {
     // Query the database for all doses of the specified medication within the calendar day for the specific user
     const dosesForMedication = await Dose.find({
       medication: medicationId,
-      user: user, // Include the user in the query
+      user: user._id, // Include the user in the query
       timestamp: { $gte: startOfDay, $lte: endOfDay },
     });
 
@@ -68,12 +74,12 @@ const createDose = async (req, res) => {
     // Create the dose with the provided information
     const createdDose = await Dose.create({
       medication: medicationId,
-      user, // Use the user ID from the request body
+      user: user._id, // Use the user ID from the request body
       timestamp: doseTimestamp.toDate(), // Convert moment object to Date
     });
 
     // Update the user's dailyDoses array
-    await User.findByIdAndUpdate(user, { $push: { dailyDoses: createdDose._id } });
+    await User.findByIdAndUpdate(user._id, { $push: { dailyDoses: createdDose._id } });
 
     res.status(200).json(createdDose);
    
