@@ -17,7 +17,7 @@ app.use(express.json());
 const corsOptions = {
   origin: function (origin, callback) {
     // Replace 'https://your-static-site.onrender.com' with your actual Render frontend URL
-    const allowedOrigins = ['https://glaucoma-mate-frontend.onrender.com', 'http://localhost:3000'];
+    const allowedOrigins = ['https://glaucoma-mate-frontend.onrender.com', 'http://localhost:3000', 'http://localhost:19006'];
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true); // Allow if it's in the allowed list or not set (server-to-server requests)
     } else {
