@@ -14,7 +14,21 @@ const app = express();
 app.use(express.json());
 
 // Add the cors middleware
-app.use(cors());
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Replace 'https://your-static-site.onrender.com' with your actual Render frontend URL
+    const allowedOrigins = ['https://glaucoma-mate-frontend.onrender.com', 'http://localhost:3000'];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true); // Allow if it's in the allowed list or not set (server-to-server requests)
+    } else {
+      callback(new Error('CORS not allowed from this domain'), false);
+    }
+  },
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
+
 
 // Establish middleware to monitor requests to server and response
 app.use((req, res, next) => {
