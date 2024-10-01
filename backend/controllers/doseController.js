@@ -88,8 +88,59 @@ const createDose = async (req, res) => {
   }
 };
 
+
+const takeAllDoses = async (req, res) => {
+  const { medicationId, user: firebaseUid } = req.body; // Get the medication ID and user from the request body
+
+  try {
+    const user = await User.findByFirebaseUid(firebaseUid);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const medication = await Medication.findById(medicationId);
+    if (!medication) {
+      return res.status(404).json({ error: "Medication not found" });
+    }
+
+    const now = moment();
+    const startOfDay = now.startOf('day').toDate();
+    const endOfDay = now.endOf('day').toDate();
+
+    // Reuse the existing logic to calculate the doses taken today
+    const dosesForMedication = await Dose.find({
+      medication: medicationId,
+      user: user._id,
+      timestamp: { $gte: startOfDay, $lte: endOfDay }
+    });
+
+    const dosesNeeded = medication.dosage - dosesForMedication.length;
+    if (dosesNeeded <= 0) {
+      return res.status(400).json({ error: "No more doses needed today." });
+    }
+
+    // Take the remaining necessary doses
+    const dosesToTake = Array.from({ length: dosesNeeded }, () => ({
+      medication: medicationId,
+      user: user._id,
+      timestamp: new Date() // using current time for all new doses
+    }));
+
+    const takenDoses = await Dose.insertMany(dosesToTake);
+
+    // Optionally update the user's dailyDoses array if needed
+    await User.findByIdAndUpdate(user._id, { $push: { dailyDoses: { $each: takenDoses.map(dose => dose._id) } } });
+
+    res.status(201).json(takenDoses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 module.exports = {
   createDose,
   getDoses,
   getDose,
+  takeAllDoses
 };

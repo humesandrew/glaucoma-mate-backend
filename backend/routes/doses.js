@@ -5,7 +5,8 @@ const Dose = require("../models/doseModel");
 const { 
   createDose,
   getDoses,
-  getDose
+  getDose,
+  takeAllDoses
  } = require('../controllers/doseController');
  const requireAuth = require('../middleware/requireAuth.js');
  
@@ -21,6 +22,8 @@ router.get("/:id", getDose);
 // Post a dose
 router.post("/", createDose)
 
+// Post a request to take all remaining doses for the day
+router.post("/takeAll", takeAllDoses);
 
 // Delete a dose
 router.delete("/:id", async (req, res) => {
