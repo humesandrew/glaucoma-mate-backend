@@ -9,35 +9,35 @@ const seedMedications = async () => {
       brand: "Xalatan",
       dosage: 1,
       sig: "Instill 1 drop every night at bedtime.",
-      capColor: "#33ffcc",
+      capColor: "#00b3b3",
     },
     {
       name: "Bimatoprost",
       brand: "Lumigan",
       dosage: 1,
       sig: "Instill 1 drop every night at bedtime.",
-      capColor: "#33ffcc",
+      capColor: "#00b3b3",
     },
     {
       name: "Travoprost",
       brand: "Travatan",
       dosage: 1,
       sig: "Instill 1 drop every night at bedtime.",
-      capColor: "#33ffcc",
+      capColor: "#00b3b3",
     },
     {
       name: "Tafluprost",
       brand: "Zioptan",
       dosage: 1,
       sig: "Instill 1 drop every night at bedtime.",
-      capColor: "#33ffcc",
+      capColor: "#00b3b3",
     },
     {
       name: "Latanoprostene bunod",
       brand: "Vyzulta",
       dosage: 1,
       sig: "Instill 1 drop every night at bedtime.",
-      capColor: "#33ffcc",
+      capColor: "#00b3b3",
     },
 
     {
@@ -52,14 +52,14 @@ const seedMedications = async () => {
       brand: "CoSopt",
       dosage: 2,
       sig: "Instill 1 drop 2 times every day.",
-      capColor: "#3333ff",
+      capColor: "#4d4dff",
     },
     {
       name: "Brimonidine/Timolol",
       brand: "Combigan",
       dosage: 2,
       sig: "Instill 1 drop 2 times every day.",
-      capColor: "#3333ff",
+      capColor: "#4d4dff",
     },
 
     {
