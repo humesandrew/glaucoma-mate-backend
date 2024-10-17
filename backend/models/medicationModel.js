@@ -10,7 +10,6 @@ const medicationSchema = new Schema(
     },
     brand: {
       type: String,
-      required: true,
     },
     dosage: {
       type: Number,
